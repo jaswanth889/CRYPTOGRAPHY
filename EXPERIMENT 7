@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void decryptSimpleSubstitution(char ciphertext[]) {
+    char decryptedText[1000];
+    char key[26];
+
+    // Initialize key with placeholder values
+    for (int i = 0; i < 26; ++i) {
+        key[i] = 'A' + i;
+    }
+
+    // Perform frequency analysis to guess the mapping
+    char frequentLetters[] = "ETAOINSHRDLCUMWFGYPBVKJXQZ";
+    for (int i = 0; i < strlen(frequentLetters); ++i) {
+        char currentChar = frequentLetters[i];
+        char cipherChar = ciphertext[i];
+
+        // Update key based on frequency analysis
+        for (int j = 0; j < 26; ++j) {
+            if (key[j] == cipherChar) {
+                key[j] = currentChar;
+                break;
+            }
+        }
+    }
+
+    // Decrypt the ciphertext using the determined key
+    for (int i = 0; ciphertext[i] != '\0'; ++i) {
+        char currentChar = ciphertext[i];
+
+        if (isalpha(currentChar)) {
+            char base = isupper(currentChar) ? 'A' : 'a';
+            decryptedText[i] = key[currentChar - base];
+        } else {
+            decryptedText[i] = currentChar;
+        }
+    }
+
+    decryptedText[strlen(ciphertext)] = '\0';
+
+    printf("Decrypted message: %s\n", decryptedText);
+}
+
+int main() {
+    char ciphertext[] = "53‡‡†305))6*;4826)4‡.)4‡);806*;48†8¶60))85;;]8*;:‡*8†83 "
+                         "(88)5*†;46(;88*96*?;8)*‡(;485);5*†2:*‡(;4956*2(5*—4)8¶8* "
+                         ";4069285);)6†8)4‡‡;1(‡9;48081;8:8‡1;48†85;4)485†528806*81 (‡9;48;(88;4(‡?34;48)4‡;161;:188;‡?;";
+
+    decryptSimpleSubstitution(ciphertext);
+
+    return 0;
+}
