@@ -1,0 +1,54 @@
+#include <stdio.h>
+
+int modInverse(int a, int m) {
+    int m0 = m, t, q;
+    int x0 = 0, x1 = 1;
+
+    if (m == 1) {
+        return 0;
+    }
+
+    // Apply extended Euclidean Algorithm
+    while (a > 1) {
+        q = a / m;
+        t = m;
+        m = a % m, a = t;
+        t = x0;
+        x0 = x1 - q * x0;
+        x1 = t;
+    }
+
+    // Make x1 positive
+    if (x1 < 0) {
+        x1 += m0;
+    }
+
+    return x1;
+}
+
+int main() {
+    char mostFrequent = 'B';  // Assuming B corresponds to E
+    char secondMostFrequent = 'U';  // Assuming U corresponds to T
+
+    int a, b;
+
+    // Calculate the indices of the assumed corresponding letters
+    int indexOfE = mostFrequent - 'A';
+    int indexOfT = secondMostFrequent - 'A';
+
+    // Find modular inverse of indexOfE
+    int aInverse = modInverse(indexOfE, 26);
+
+    // Solve for a and b in the equations
+    a = (indexOfT * aInverse) % 26;
+    b = (indexOfE - a * ('E' - 'A')) % 26;
+
+    // Ensure that b is positive
+    if (b < 0) {
+        b += 26;
+    }
+
+    printf("The affine cipher parameters are: a = %d, b = %d\n", a, b);
+
+    return 0;
+}
