@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+void encryptVigenere(char plaintext[], char key[]) {
+    int i, j;
+    char ciphertext[100];
+
+    for (i = 0, j = 0; plaintext[i] != '\0'; ++i) {
+        char currentChar = plaintext[i];
+
+        if (isalpha(currentChar)) {
+            char base = isupper(currentChar) ? 'A' : 'a';
+            ciphertext[i] = (currentChar + key[j] - 2 * base) % 26 + base;
+            ++j;
+
+            // Repeat the key if it is shorter than the plaintext
+            if (key[j] == '\0') {
+                j = 0;
+            }
+        } else {
+            ciphertext[i] = currentChar;
+        }
+    }
+
+    ciphertext[i] = '\0';
+
+    printf("Encrypted message: %s\n", ciphertext);
+}
+
+int main() {
+    char plaintext[100];
+    char key[20];
+
+    // Get the key from the user
+    printf("Enter the key (only uppercase letters): ");
+    scanf("%s", key);
+
+    // Get the plaintext from the user
+    printf("Enter the plaintext: ");
+    scanf(" %[^\n]s", plaintext);
+
+    // Encrypt the plaintext using the Vigenere cipher
+    encryptVigenere(plaintext, key);
+
+    return 0;
+}
