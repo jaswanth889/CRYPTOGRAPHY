@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <string.h>
+
+void encrypt(char message[], char key[]) {
+    int i;
+    char encrypted_message[100];
+
+    for (i = 0; message[i] != '\0'; ++i) {
+        if (message[i] >= 'A' && message[i] <= 'Z') {
+            encrypted_message[i] = key[message[i] - 'A'];
+        } else if (message[i] >= 'a' && message[i] <= 'z') {
+            encrypted_message[i] = key[message[i] - 'a'];
+        } else {
+            encrypted_message[i] = message[i];
+        }
+    }
+
+    encrypted_message[i] = '\0';
+
+    printf("Encrypted message: %s\n", encrypted_message);
+}
+
+int main() {
+    char message[100];
+    char key[] = "ZYXWVUTSRQPONMLKJIHGFEDCBAzyxwvutsrqponmlkjihgfedcba";
+
+    printf("Enter a message: ");
+    fgets(message, sizeof(message), stdin);
+
+    // Remove the newline character at the end of the input
+    if (message[strlen(message) - 1] == '\n') {
+        message[strlen(message) - 1] = '\0';
+    }
+
+    encrypt(message, key);
+
+    return 0;
+}
