@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <string.h>
+
+#define SIZE 5
+
+// Function to print the Playfair matrix
+void printPlayfairMatrix(char matrix[SIZE][SIZE]) {
+    printf("Playfair Matrix:\n");
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            printf("%c ", matrix[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+// Function to fill the Playfair matrix with the key
+void fillPlayfairMatrix(char matrix[SIZE][SIZE], char *key) {
+    // Initialize matrix with the key
+    int keyLen = strlen(key);
+    int k = 0;
+    int used[26] = {0}; // to keep track of used letters
+
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            // Skip 'J' as it's often combined with 'I' in Playfair cipher
+            while (used[key[k] - 'A'] || key[k] == 'J') {
+                k++;
+            }
+
+            matrix[i][j] = key[k];
+            used[key[k] - 'A'] = 1;
+            k++;
+        }
+    }
+}
+
+int main() {
+    char playfairMatrix[SIZE][SIZE];
+
+    // Define the key
+    char key[] = "MFHIJKUNOPQZVWXYELARGDSTBC";
+
+    // Fill the Playfair matrix
+    fillPlayfairMatrix(playfairMatrix, key);
+
+    // Print the Playfair matrix
+    printPlayfairMatrix(playfairMatrix);
+
+    return 0;
+}
