@@ -1,0 +1,75 @@
+#include <stdio.h>
+
+// Function to encrypt a 2x2 matrix Hill cipher
+void hillEncrypt(int message[], int key[][2], int result[]) {
+    result[0] = (key[0][0] * message[0] + key[0][1] * message[1]) % 26;
+    result[1] = (key[1][0] * message[0] + key[1][1] * message[1]) % 26;
+}
+
+// Function to decrypt a 2x2 matrix Hill cipher
+void hillDecrypt(int message[], int key[][2], int result[]) {
+    // Calculate the inverse of the key matrix
+    int det = key[0][0] * key[1][1] - key[0][1] * key[1][0];
+    int detInv;
+
+    // Find the multiplicative inverse of the determinant modulo 26
+    for (detInv = 1; detInv < 26; detInv++) {
+        if ((det * detInv) % 26 == 1) {
+            break;
+        }
+    }
+
+    // Calculate the adjugate matrix
+    int keyInv[2][2];
+    keyInv[0][0] = key[1][1];
+    keyInv[1][1] = key[0][0];
+    keyInv[0][1] = (26 + (-key[0][1])) % 26;
+    keyInv[1][0] = (26 + (-key[1][0])) % 26;
+
+    // Calculate the decrypted message
+    result[0] = (keyInv[0][0] * message[0] + keyInv[0][1] * message[1]) % 26;
+    result[1] = (keyInv[1][0] * message[0] + keyInv[1][1] * message[1]) % 26;
+}
+
+int main() {
+    // Given key matrix
+    int key[2][2] = {
+        {9, 4},
+        {5, 7}
+    };
+
+    // Message: "meet me at the usual place at ten rather than eight oclock"
+    int message[54] = {12, 4, 4, 19, 12, 4, 0, 19, 7, 20, 0, 19, 7, 20, 8, 4, 0, 20, 8, 5, 0, 21, 19, 21, 1, 12, 0, 16, 12, 1, 3, 0, 0, 19, 9, 7, 8, 20, 0, 0, 15, 21, 0, 20, 5, 8, 0, 21, 14, 8, 18, 4, 4, 0, 15, 2, 12, 15, 3, 11};
+
+    // Array to store the encrypted message
+    int encryptedMessage[54];
+
+    // Encrypt the message
+    for (int i = 0; i < 54; i += 2) {
+        hillEncrypt(&message[i], key, &encryptedMessage[i]);
+    }
+
+    // Print the encrypted message
+    printf("Encrypted Message: ");
+    for (int i = 0; i < 54; i++) {
+        printf("%c", encryptedMessage[i] + 'A');
+    }
+    printf("\n");
+
+    // Array to store the decrypted message
+    int decryptedMessage[54];
+
+    // Decrypt the message
+    for (int i = 0; i < 54; i += 2) {
+        hillDecrypt(&encryptedMessage[i], key, &decryptedMessage[i]);
+    }
+
+    // Print the decrypted message
+    printf("Decrypted Message: ");
+    for (int i = 0; i < 54; i++) {
+        printf("%c", decryptedMessage[i] + 'A');
+    }
+    printf("\n");
+
+    return 0;
+}
