@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <math.h>
+
+double calculatePossibleKeys() {
+    // Number of unique letters in the Playfair cipher key
+    int numUniqueLetters = 25;
+
+    // Calculate factorial of numUniqueLetters
+    double result = 1;
+    for (int i = 1; i <= numUniqueLetters; i++) {
+        result *= i;
+    }
+
+    return result;
+}
+
+int main() {
+    // Calculate the number of possible keys
+    double possibleKeys = calculatePossibleKeys();
+
+    // Express the result as an approximate power of 2
+    double logBase2 = log2(possibleKeys);
+
+    printf("Number of possible keys: %.0f\n", possibleKeys);
+    printf("Expressed as an approximate power of 2: 2^%.0f\n", logBase2);
+
+    return 0;
+}
