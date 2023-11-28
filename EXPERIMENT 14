@@ -16,23 +16,63 @@ void vigenereOneTimePadEncrypt(char plaintext[], int key[], char ciphertext[]) {
     }
 }
 
+// Function to perform one-time pad Vigenère decryption
+void vigenereOneTimePadDecrypt(char ciphertext[], int key[], char decrypted[]) {
+    int length = strlen(ciphertext);
+
+    for (int i = 0; i < length; i++) {
+        if (ciphertext[i] >= 'A' && ciphertext[i] <= 'Z') {
+            decrypted[i] = (ciphertext[i] - 'A' - key[i] + 26) % 26 + 'A';
+        } else if (ciphertext[i] >= 'a' && ciphertext[i] <= 'z') {
+            decrypted[i] = (ciphertext[i] - 'a' - key[i] + 26) % 26 + 'a';
+        } else {
+            decrypted[i] = ciphertext[i]; // Keep non-alphabetic characters unchanged
+        }
+    }
+}
+
 int main() {
-    char plaintext[] = "SENDMOREMONEY";
+    // Part (a): Encrypt the plaintext "send more money" with the given key stream
+    char plaintext[] = "send more money";
     int keyStream[] = {9, 0, 1, 7, 23, 15, 21, 14, 11, 11, 2, 8, 9};
     int keyLength = sizeof(keyStream) / sizeof(keyStream[0]);
 
     char ciphertext[sizeof(plaintext)];
-    
-    // Encrypt the plaintext with the given key stream
     vigenereOneTimePadEncrypt(plaintext, keyStream, ciphertext);
 
-    printf("Original Message: %s\n", plaintext);
+    printf("Part (a):\n");
+    printf("Plaintext: %s\n", plaintext);
     printf("Key Stream: ");
     for (int i = 0; i < keyLength; i++) {
         printf("%d ", keyStream[i]);
     }
     printf("\n");
-    printf("Encrypted Message: %s\n", ciphertext);
+    printf("Ciphertext: %s\n\n", ciphertext);
+
+    // Part (b): Find the key to decrypt the ciphertext to "cash not needed"
+    char targetPlaintext[] = "cash not needed";
+    int keyToDecrypt[sizeof(keyStream)];
+    char decryptedText[sizeof(plaintext)];
+
+    // Brute-force the key to find a match
+    for (int k = 0; k < 26; k++) {
+        for (int i = 0; i < keyLength; i++) {
+            keyToDecrypt[i] = (k + keyStream[i]) % 26;
+        }
+
+        vigenereOneTimePadDecrypt(ciphertext, keyToDecrypt, decryptedText);
+
+        if (strcmp(decryptedText, targetPlaintext) == 0) {
+            printf("Part (b):\n");
+            printf("Found key to decrypt to \"%s\" with key stream: ", targetPlaintext);
+            for (int i = 0; i < keyLength; i++) {
+                printf("%d ", keyToDecrypt[i]);
+            }
+            printf("\n");
+            printf("Decrypted Text: %s\n", decryptedText);
+            break;
+        }
+    }
 
     return 0;
 }
