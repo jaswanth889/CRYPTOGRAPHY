@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define ALPHABET_SIZE 26
+
+// Function to calculate the frequency of each letter in the given text
+void calculateLetterFrequency(const char *text, int frequency[]) {
+    while (*text) {
+        if (isalpha(*text)) {
+            char letter = tolower(*text);
+            frequency[letter - 'a']++;
+        }
+        text++;
+    }
+}
+
+// Function to perform a letter frequency attack on a monoalphabetic substitution cipher
+void letterFrequencyAttack(const char *ciphertext, int topPlaintexts) {
+    int ciphertextLength = strlen(ciphertext);
+    
+    // Calculate the letter frequency in the ciphertext
+    int frequency[ALPHABET_SIZE] = {0};
+    calculateLetterFrequency(ciphertext, frequency);
+
+    // Create a mapping of letters to their frequencies
+    typedef struct {
+        char letter;
+        int freq;
+    } LetterFrequency;
+    
+    LetterFrequency letterFreq[ALPHABET_SIZE];
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        letterFreq[i].letter = 'a' + i;
+        letterFreq[i].freq = frequency[i];
+    }
+
+    // Sort the mapping based on frequencies in descending order
+    for (int i = 0; i < ALPHABET_SIZE - 1; i++) {
+        for (int j = i + 1; j < ALPHABET_SIZE; j++) {
+            if (letterFreq[i].freq < letterFreq[j].freq) {
+                LetterFrequency temp = letterFreq[i];
+                letterFreq[i] = letterFreq[j];
+                letterFreq[j] = temp;
+            }
+        }
+    }
+
+    // Guess the most frequent letters in English and map them to the corresponding letters in the ciphertext
+    char mapping[ALPHABET_SIZE];
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        mapping[i] = letterFreq[i].letter;
+    }
+
+    // Decrypt the ciphertext using the guessed mapping
+    printf("Possible plaintexts:\n");
+    for (int i = 0; i < topPlaintexts; i++) {
+        printf("%d. ", i + 1);
+        for (int j = 0; j < ciphertextLength; j++) {
+            char decryptedChar = ciphertext[j];
+            if (isalpha(decryptedChar)) {
+                decryptedChar = tolower(decryptedChar);
+                decryptedChar = mapping[decryptedChar - 'a'];
+                if (isupper(ciphertext[j])) {
+                    decryptedChar = toupper(decryptedChar);
+                }
+            }
+            printf("%c", decryptedChar);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    // Example ciphertext
+    const char *ciphertext = "Hwsd sduj ne!";
+    
+    // Number of top possible plaintexts to display
+    int topPlaintexts = 10;
+
+    printf("Ciphertext: %s\n\n", ciphertext);
+
+    // Perform letter frequency attack and display possible plaintexts
+    letterFrequencyAttack(ciphertext, topPlaintexts);
+
+    return 0;
+}
