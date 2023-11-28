@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define ALPHABET_SIZE 26
+
+// Function to calculate the frequency of each letter in the given text
+void calculateLetterFrequency(const char *text, int frequency[]) {
+    while (*text) {
+        if (isalpha(*text)) {
+            char letter = tolower(*text);
+            frequency[letter - 'a']++;
+        }
+        text++;
+    }
+}
+
+// Function to perform a letter frequency attack on an additive cipher
+void letterFrequencyAttack(const char *ciphertext, int topPlaintexts) {
+    int ciphertextLength = strlen(ciphertext);
+    
+    // Calculate the letter frequency in the ciphertext
+    int frequency[ALPHABET_SIZE] = {0};
+    calculateLetterFrequency(ciphertext, frequency);
+
+    // Find the most frequent letter in the ciphertext
+    int maxFrequency = 0;
+    char mostFrequentLetter;
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        if (frequency[i] > maxFrequency) {
+            maxFrequency = frequency[i];
+            mostFrequentLetter = 'a' + i;
+        }
+    }
+
+    // Guess the shift based on the most frequent letter
+    int shift = mostFrequentLetter - 'e';  // 'e' is the most frequent letter in English
+
+    printf("Most frequent letter in ciphertext: %c\n", mostFrequentLetter);
+    printf("Estimated shift: %d\n\n", shift);
+
+    // Decrypt the ciphertext using the estimated shift
+    printf("Possible plaintexts:\n");
+    for (int i = 0; i < topPlaintexts; i++) {
+        printf("%d. ", i + 1);
+        for (int j = 0; j < ciphertextLength; j++) {
+            char decryptedChar = ciphertext[j];
+            if (isalpha(decryptedChar)) {
+                decryptedChar = tolower(decryptedChar);
+                decryptedChar = 'a' + (decryptedChar - 'a' - shift + ALPHABET_SIZE) % ALPHABET_SIZE;
+                if (isupper(ciphertext[j])) {
+                    decryptedChar = toupper(decryptedChar);
+                }
+            }
+            printf("%c", decryptedChar);
+        }
+        printf("\n");
+        shift++;
+    }
+}
+
+int main() {
+    // Example ciphertext
+    const char *ciphertext = "Hwsd sduj ne!";
+    
+    // Number of top possible plaintexts to display
+    int topPlaintexts = 10;
+
+    printf("Ciphertext: %s\n\n", ciphertext);
+
+    // Perform letter frequency attack and display possible plaintexts
+    letterFrequencyAttack(ciphertext, topPlaintexts);
+
+    return 0;
+}
