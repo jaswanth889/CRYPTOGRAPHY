@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+// Function to generate a random key stream
+void generateKey(int key[], int length) {
+    for (int i = 0; i < length; i++) {
+        key[i] = rand() % 26; // Generate random numbers between 0 and 26
+    }
+}
+
+// Function to perform Vigenère encryption
+void vigenereEncrypt(char plaintext[], int key[], char ciphertext[]) {
+    int length = strlen(plaintext);
+
+    for (int i = 0; i < length; i++) {
+        if (plaintext[i] >= 'A' && plaintext[i] <= 'Z') {
+            ciphertext[i] = (plaintext[i] - 'A' + key[i]) % 26 + 'A';
+        } else if (plaintext[i] >= 'a' && plaintext[i] <= 'z') {
+            ciphertext[i] = (plaintext[i] - 'a' + key[i]) % 26 + 'a';
+        } else {
+            ciphertext[i] = plaintext[i]; // Keep non-alphabetic characters unchanged
+        }
+    }
+}
+
+// Function to perform Vigenère decryption
+void vigenereDecrypt(char ciphertext[], int key[], char decrypted[]) {
+    int length = strlen(ciphertext);
+
+    for (int i = 0; i < length; i++) {
+        if (ciphertext[i] >= 'A' && ciphertext[i] <= 'Z') {
+            decrypted[i] = (ciphertext[i] - 'A' - key[i] + 26) % 26 + 'A';
+        } else if (ciphertext[i] >= 'a' && ciphertext[i] <= 'z') {
+            decrypted[i] = (ciphertext[i] - 'a' - key[i] + 26) % 26 + 'a';
+        } else {
+            decrypted[i] = ciphertext[i]; // Keep non-alphabetic characters unchanged
+        }
+    }
+}
+
+int main() {
+    srand(time(NULL)); // Seed for random number generation
+
+    char plaintext[] = "HelloWorld";
+    int keyLength = strlen(plaintext);
+
+    int key[keyLength];
+    generateKey(key, keyLength);
+
+    char ciphertext[keyLength];
+    vigenereEncrypt(plaintext, key, ciphertext);
+
+    char decrypted[keyLength];
+    vigenereDecrypt(ciphertext, key, decrypted);
+
+    printf("Original Message: %s\n", plaintext);
+    printf("Encrypted Message: %s\n", ciphertext);
+    printf("Decrypted Message: %s\n", decrypted);
+
+    return 0;
+}
