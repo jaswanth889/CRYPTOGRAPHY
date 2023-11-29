@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+typedef uint64_t KeyType;
+typedef uint32_t DataType;
+
+// Function prototypes
+void generateSubKeys(KeyType key, KeyType *subKeys);
+void desEncrypt(DataType *data, KeyType *subKeys);
+void desDecrypt(DataType *data, KeyType *subKeys);
+
+int main() {
+    // Example key (64 bits)
+    KeyType key = 0x0123456789ABCDEF;
+
+    // Example plaintext (64 bits)
+    DataType plaintext = 0x0123456789ABCDEF;
+
+    // Subkeys array (48 bits each, for 16 rounds)
+    KeyType subKeys[16];
+
+    // Generate subkeys
+    generateSubKeys(key, subKeys);
+
+    // Encrypt the plaintext
+    printf("Original plaintext: %016llX\n", plaintext);
+    desEncrypt(&plaintext, subKeys);
+    printf("Encrypted ciphertext: %016llX\n", plaintext);
+
+    // Decrypt the ciphertext
+    desDecrypt(&plaintext, subKeys);
+    printf("Decrypted plaintext: %016llX\n", plaintext);
+
+    return 0;
+}
+
+// Function to generate subkeys
+void generateSubKeys(KeyType key, KeyType *subKeys) {
+    // Perform the key schedule to generate 16 subkeys
+    // (Here, you would implement the logic for dividing the initial key into two halves,
+    // and each subkey is derived from a different subset of 28 bits.)
+    // For simplicity, we will just copy the original key into each subkey in this example.
+
+    for (int i = 0; i < 16; ++i) {
+        subKeys[i] = key;
+    }
+}
+
+// Function to perform DES encryption
+void desEncrypt(DataType *data, KeyType *subKeys) {
+    // Implement the DES encryption algorithm here
+    // (For simplicity, we'll just do a placeholder operation: XOR the data with the subkeys.)
+
+    for (int i = 0; i < 16; ++i) {
+        *data ^= subKeys[i];
+    }
+}
+
+// Function to perform DES decryption
+void desDecrypt(DataType *data, KeyType *subKeys) {
+    // Implement the DES decryption algorithm here
+    // (For simplicity, we'll just do the reverse operation: XOR the data with the subkeys in reverse order.)
+
+    for (int i = 15; i >= 0; --i) {
+        *data ^= subKeys[i];
+    }
+}
