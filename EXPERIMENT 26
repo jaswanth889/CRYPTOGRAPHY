@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+// Function to calculate the greatest common divisor (GCD) using Euclid's algorithm
+uint64_t gcd(uint64_t a, uint64_t b) {
+    while (b != 0) {
+        uint64_t temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+// Function to calculate the modular multiplicative inverse using the extended Euclidean algorithm
+uint64_t mod_inverse(uint64_t a, uint64_t m) {
+    int64_t m0 = m;
+    int64_t y = 0, x = 1;
+
+    while (a > 1) {
+        int64_t q = a / m;
+        int64_t t = m;
+
+        m = a % m;
+        a = t;
+        t = y;
+
+        y = x - q * y;
+        x = t;
+    }
+
+    if (x < 0)
+        x += m0;
+
+    return x;
+}
+
+// Function to generate a new RSA key pair
+void generate_rsa_key_pair(uint64_t *e, uint64_t *d, uint64_t *n) {
+    // Choose two large prime numbers (p and q)
+    uint64_t p = 61;
+    uint64_t q = 53;
+
+    // Calculate n
+    *n = p * q;
+
+    // Calculate Euler's totient function (phi(n))
+    uint64_t phi_n = (p - 1) * (q - 1);
+
+    // Choose a new public exponent (e)
+    *e = 17; // Commonly used value
+
+    // Calculate the modular multiplicative inverse of e modulo phi(n) to get the private exponent (d)
+    *d = mod_inverse(*e, phi_n);
+}
+
+int main() {
+    // Leaked private key (d)
+    uint64_t leaked_d = 47;  // Replace with the actual leaked private key
+
+    // New public and private keys
+    uint64_t new_e, new_d, new_n;
+
+    // Generate a new RSA key pair
+    generate_rsa_key_pair(&new_e, &new_d, &new_n);
+
+    // Display the results
+    printf("Leaked Private Key (d): %llu\n", leaked_d);
+    printf("New Public Key (e, n): (%llu, %llu)\n", new_e, new_n);
+    printf("New Private Key (d, n): (%llu, %llu)\n", new_d, new_n);
+
+    return 0;
+}
