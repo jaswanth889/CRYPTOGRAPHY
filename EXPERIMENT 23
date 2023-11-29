@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdint.h>
+
+// S-DES Key
+uint8_t key[10] = {0, 1, 1, 1, 1, 1, 1, 0, 1, 0};
+
+// Function to perform the S-DES encryption
+void sdes_encrypt(uint8_t *plaintext, uint8_t *key, uint8_t *iv, uint8_t *ciphertext) {
+    // Generate round keys
+    uint8_t round_key1[8];
+    uint8_t round_key2[8];
+
+    // Function prototypes
+    void permute_p10(uint8_t *key, uint8_t *permuted_key);
+    void circular_left_shift_1(uint8_t *key);
+    void permute_p8(uint8_t *key, uint8_t *permuted_key);
+    void initial_permutation(uint8_t *plaintext, uint8_t *permuted_plaintext);
+    void expansion_p4(uint8_t *half_block, uint8_t *expanded_half_block);
+    void xor_4bit(uint8_t *block1, uint8_t *block2, uint8_t *result);
+    void sbox_substitution(uint8_t *input, uint8_t *output);
+    void permutation_p4(uint8_t *input, uint8_t *output);
+    void sdes_f_function(uint8_t *right_half, uint8_t *key, uint8_t *result);
+
+    // Initial Permutation
+    uint8_t permuted_plaintext[8];
+    initial_permutation(plaintext, permuted_plaintext);
+
+    // Generate round keys
+    uint8_t permuted_key[10];
+    permute_p10(key, permuted_key);
+    circular_left_shift_1(permuted_key);
+    permute_p8(permuted_key, round_key1);
+
+    circular_left_shift_1(permuted_key);
+    circular_left_shift_1(permuted_key);
+    permute_p8(permuted_key, round_key2);
+
+    // Encryption
+    uint8_t counter[8];
+    uint8_t encrypted_counter[8];
+
+    for (int i = 0; i < 8; ++i) {
+        counter[i] = iv[i];
+    }
+
+    for (int i = 0; i < 8; ++i) {
+        // Encrypt the counter value
+        sdes_f_function(counter, round_key1, encrypted_counter);
+
+        // XOR the result with the plaintext
+        xor_4bit(permuted_plaintext + i * 4, encrypted_counter, ciphertext + i * 4);
+
+        // Increment the counter for the next iteration
+        for (int j = 7; j >= 0; --j) {
+            if (counter[j] == 0) {
+                counter[j] = 1;
+                break;
+            } else {
+                counter[j] = 0;
+            }
+        }
+    }
+}
+
+int main() {
+    // Test data
+    uint8_t plaintext[] = {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0};
+    uint8_t key[] = {0, 1, 1, 1, 1, 1, 1, 0, 1, 0};
+    uint8_t iv[] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    // Buffer for ciphertext
+    uint8_t ciphertext[32];
+
+    // Perform encryption
+    sdes_encrypt(plaintext, key, iv, ciphertext);
+
+    // Print the results
+    printf("S-DES Counter Mode Encryption:\n");
+    printf("Plaintext: ");
+    for (int i = 0; i < 32; ++i) {
+        printf("%d", plaintext[i]);
+    }
+    printf("\n");
+
+    printf("Ciphertext: ");
+    for (int i = 0; i < 32; ++i) {
+        printf("%d", ciphertext[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
