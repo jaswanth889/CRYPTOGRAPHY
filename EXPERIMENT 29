@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <stdint.h>
+
+// Constants for SHA-3
+#define ROWS 5
+#define COLUMNS 5
+#define LANE_SIZE 64
+#define CAPACITY 512
+
+// Internal state matrix
+uint64_t state[ROWS][COLUMNS];
+
+// Function to simulate the SHA-3 permutation
+void sha3_permutation() {
+    // Simulate the permutation (this part would be more complex in a real implementation)
+    // For simplicity, we just increment each element by 1
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLUMNS; j++) {
+            state[i][j]++;
+        }
+    }
+}
+
+// Function to check if all lanes in the capacity portion are nonzero
+int all_lanes_nonzero() {
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLUMNS; j++) {
+            if (j * LANE_SIZE < CAPACITY && state[i][j] == 0) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+int main() {
+    // Initialize the internal state matrix to all zeros
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLUMNS; j++) {
+            state[i][j] = 0;
+        }
+    }
+
+    int rounds = 0;
+
+    // Simulate SHA-3 permutation until all lanes in the capacity portion are nonzero
+    while (!all_lanes_nonzero()) {
+        sha3_permutation();
+        rounds++;
+    }
+
+    printf("It took %d rounds to fill all lanes in the capacity portion with nonzero bits.\n", rounds);
+
+    return 0;
+}
